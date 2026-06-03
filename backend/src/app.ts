@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { prisma } from "./lib/prisma";
 
 const app = express();
 
@@ -12,4 +13,11 @@ app.get("/health", (_, res) => {
   });
 });
 
+app.get("/db-test", async (_, res) => {
+  const video = await prisma.video.create({
+    data: {},
+  });
+
+  res.json(video);
+});
 export default app;
