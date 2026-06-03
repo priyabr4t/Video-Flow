@@ -3,10 +3,13 @@ import cors from "cors";
 import { prisma } from "./lib/prisma";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "./storage/s3";
+import videoRoutes from "./routes/video.routes";
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/videos", videoRoutes);
 
 app.get("/health", (_, res) => {
   res.status(200).json({
