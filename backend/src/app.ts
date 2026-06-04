@@ -17,32 +17,4 @@ app.get("/health", (_, res) => {
   });
 });
 
-app.get("/db-test", async (_, res) => {
-  const video = await prisma.video.create({
-    data: {},
-  });
-
-  res.json(video);
-});
-
-app.get("/s3-test", async (_, res) => {
-  try {
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET_NAME!,
-        Key: "test.txt",
-        Body: "Hello from VideoFlow",
-      })
-    );
-
-    res.json({
-      success: true,
-      message: "File uploaded successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json(error);
-  }
-});
-
 export default app;
