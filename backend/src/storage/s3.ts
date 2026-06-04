@@ -1,5 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
+// Initialize the S3 client with credentials from environment variables
 export const s3 = new S3Client({
     region: process.env.AWS_REGION!,
     credentials: {
