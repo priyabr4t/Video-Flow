@@ -1,8 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { prisma } from "./lib/prisma";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3 } from "./storage/s3";
 import videoRoutes from "./routes/video.routes";
 
 const app = express();

@@ -19,6 +19,7 @@ model Video {
 }
 
 enum VideoStatus {
+  UPLOADING
   QUEUED
   PROCESSING
   COMPLETED
