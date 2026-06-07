@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 
 import { prisma } from "../lib/prisma";
 import { uploadToS3 } from "../storage/uploadToS3";
+import { videoQueue } from "../queue/video.queue";
 
 export const uploadVideo = async (
     req: Request,
@@ -18,7 +19,7 @@ export const uploadVideo = async (
         const video = await prisma.video.create({
             data: {},
         });
-        
+
         // Generate a unique S3 key for the uploaded video
         const key = `raw/${video.id}/original.mp4`;
 
@@ -35,9 +36,18 @@ export const uploadVideo = async (
             },
             data: {
                 originalKey: key,
+                status: "QUEUED",
             },
         });
-        
+
+        // Create BullMQ job
+        await videoQueue.add(
+            "transcode-video",
+            {
+                videoId: video.id,
+            }
+        );
+
         // Delete the local file after uploading to S3
         fs.unlinkSync(req.file.path);
 
