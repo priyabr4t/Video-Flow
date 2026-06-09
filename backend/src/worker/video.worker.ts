@@ -10,3 +10,5 @@ const worker = new Worker(
         connection
     }
 )
+
+console.log("Worker started...");
