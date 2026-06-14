@@ -15,12 +15,12 @@ export const uploadVideo = async (
                 message: "No file uploaded",
             });
         }
-        // Create a new video record in the database
+        // Create a new empty video record in the database
         const video = await prisma.video.create({
             data: {},
         });
 
-        // Generate a unique S3 key for the uploaded video
+        // Generate an unique S3 key for the uploaded video by taking the video id from the empty record created in the db
         const key = `raw/${video.id}/original.mp4`;
 
         // Upload the video file to S3
@@ -29,7 +29,7 @@ export const uploadVideo = async (
             key
         );
 
-        // Update the video record with the S3 key
+        // Update the video record in the db with the S3 key
         await prisma.video.update({
             where: {
                 id: video.id,
