@@ -10,15 +10,21 @@ export const uploadVideo = async (
     res: Response
 ) => {
     try {
+
+
         if (!req.file) {
             return res.status(400).json({
                 message: "No file uploaded",
             });
         }
+        console.log("1. File received");
+
         // Create a new empty video record in the database
         const video = await prisma.video.create({
             data: {},
         });
+        console.log("2. DB record created");
+
 
         // Generate an unique S3 key for the uploaded video by taking the video id from the empty record created in the db
         const key = `raw/${video.id}/original.mp4`;
@@ -28,6 +34,7 @@ export const uploadVideo = async (
             req.file.path,
             key
         );
+        console.log("3. Uploaded to S3");
 
         // Update the video record in the db with the S3 key
         await prisma.video.update({
@@ -39,6 +46,7 @@ export const uploadVideo = async (
                 status: "QUEUED",
             },
         });
+        console.log("4. DB updated");
 
         // Create BullMQ job
         await videoQueue.add(
@@ -47,9 +55,11 @@ export const uploadVideo = async (
                 videoId: video.id,
             }
         );
+        console.log("5. Job queued");
 
         // Delete the local file after uploading to S3
         fs.unlinkSync(req.file.path);
+        console.log("6. Sending response");
 
         return res.json({
             success: true,
