@@ -1,6 +1,7 @@
 import { Worker } from "bullmq";
 import { connection } from "../queue/connection"
 import { prisma } from "../lib/prisma";
+import { downloadFromS3 } from "../storage/downloadFromS3";
 
 const worker = new Worker(
     "video-processing",
@@ -25,9 +26,12 @@ const worker = new Worker(
                 status: "PROCESSING"
             }
         })
+        
+        // download video from s3
+        const localPath = await downloadFromS3(video!.s3Key, `${videoId}.mp4`)
 
-        // log video
-        console.log(video);
+        // do some processing here...
+        console.log(`Downloaded video ${videoId} to ${localPath}`);
     },
     {
         connection
