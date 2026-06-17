@@ -2,6 +2,7 @@ import { Worker } from "bullmq";
 import { connection } from "../queue/connection"
 import { prisma } from "../lib/prisma";
 import { downloadFromS3 } from "../storage/downloadFromS3";
+import { transcodeVideo } from "../services/transcodeVideo";
 
 const worker = new Worker(
     "video-processing",
@@ -38,6 +39,20 @@ const worker = new Worker(
         // download video from s3
         const localPath = await downloadFromS3(video!.originalKey!, `${videoId}.mp4`)
 
+        // transcode video using ffmpeg and save to temp folder
+        const outputPath = `temp/${videoId}-output.mp4`;
+
+        console.log("Starting transcoding...");
+
+        await transcodeVideo(
+            localPath,
+            outputPath
+        );
+
+        console.log(
+            `Transcoded video saved at ${outputPath}`
+        );
+        
         // do some processing here...
         console.log(`Downloaded video ${videoId} to ${localPath}`);
     },
