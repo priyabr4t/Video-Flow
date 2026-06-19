@@ -39,20 +39,35 @@ const worker = new Worker(
         // download video from s3
         const localPath = await downloadFromS3(video!.originalKey!, `${videoId}.mp4`)
 
-        // transcode video using ffmpeg and save to temp folder
-        const outputPath = `temp/${videoId}-output.mp4`;
-
         console.log("Starting transcoding...");
 
+        // transcode video to 360p using ffmpeg and save to temp folder
         await transcodeVideo(
             localPath,
-            outputPath
+            `temp/${videoId}-360p.mp4`,
+            640,
+            360
+        );
+
+        // transcode video to 720p using ffmpeg and save to temp folder
+        await transcodeVideo(
+            localPath,
+            `temp/${videoId}-720p.mp4`,
+            1280,
+            720
+        );
+        // transcode video to 1080p using ffmpeg and save to temp folder
+        await transcodeVideo(
+            localPath,
+            `temp/${videoId}-1080p.mp4`,
+            1920,
+            1080
         );
 
         console.log(
-            `Transcoded video saved at ${outputPath}`
+            `Transcoded video saved at ${`temp/${videoId}-360p.mp4`}, ${`temp/${videoId}-720p.mp4`}, ${`temp/${videoId}-1080p.mp4`}`
         );
-        
+
         // do some processing here...
         console.log(`Downloaded video ${videoId} to ${localPath}`);
     },

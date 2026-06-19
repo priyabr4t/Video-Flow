@@ -19,7 +19,7 @@ export async function transcodeVideo(
             "-c:a", "aac",          // Audio codec: AAC 
 
             "-y",                   // Overwrite output file if it exists
-            outputPath              //
+            outputPath              // Output file path
         ]);
 
 
