@@ -2,20 +2,26 @@ import { spawn } from "child_process";
 
 export async function transcodeVideo(
     inputPath: string,
-    outputPath: string
+    outputPath: string,
+    width: number,
+    height: number,
 ): Promise<void> {
     return new Promise((resolve, reject) => {
 
         // Spawn a new FFmpeg process
         const ffmpeg = spawn("ffmpeg", [
-            "-i", inputPath,      // Input video file
+            "-i", inputPath,               // Input file
 
-            "-c:v", "libx264",    // Encode video using H.264
-            "-c:a", "aac",        // Encode audio using AAC
+            "-vf",                         // Video filter option
+            `scale=${width}:${height}`,    // Scale video to specified width and height
 
-            "-y",                 // Overwrite output file if it already exists
-            outputPath            // Output video file
+            "-c:v", "libx264",       // Video codec: H.264
+            "-c:a", "aac",          // Audio codec: AAC 
+
+            "-y",                   // Overwrite output file if it exists
+            outputPath              //
         ]);
+
 
         // FFmpeg prints progress and logs to stderr
         ffmpeg.stderr.on("data", (data) => {
