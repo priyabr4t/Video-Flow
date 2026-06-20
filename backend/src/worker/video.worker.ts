@@ -69,6 +69,18 @@ const worker = new Worker(
         await uploadToS3(p1080Path, p1080Key);
 
         // STORE S3 KEYS IN DATABASE
+        await prisma.video.update({
+            where: {
+                id: videoId,
+            },
+            data: {
+                p360: p360Key,
+                p720: p720Key,
+                p1080: p1080Key,
+                status: "COMPLETED"
+            }
+        })
+
         // MARK COMPLETED IN DATABASE
 
         // do some processing here...
