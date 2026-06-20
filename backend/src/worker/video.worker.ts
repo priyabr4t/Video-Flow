@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma";
 import { downloadFromS3 } from "../storage/downloadFromS3";
 import { transcodeVideo } from "../services/transcodeVideo";
 import { uploadToS3 } from "../storage/uploadToS3";
+import fs from "fs";
 
 const worker = new Worker(
     "video-processing",
@@ -68,7 +69,7 @@ const worker = new Worker(
         await uploadToS3(p720Path, p720Key);
         await uploadToS3(p1080Path, p1080Key);
 
-        // STORE S3 KEYS IN DATABASE
+        // STORE S3 KEYS IN DATABASE & UPDATE VIDEO STATUS TO COMPLETED
         await prisma.video.update({
             where: {
                 id: videoId,
@@ -81,10 +82,14 @@ const worker = new Worker(
             }
         })
 
-        // MARK COMPLETED IN DATABASE
+        // DELETE TEMP FILES
+        fs.unlinkSync(localPath);
+        fs.unlinkSync(p360Path);
+        fs.unlinkSync(p720Path);
+        fs.unlinkSync(p1080Path);
 
-        // do some processing here...
-        console.log(`Downloaded video ${videoId} to ${localPath}`);
+        console.log(`Video ${videoId} processed successfully.`);
+
     },
     {
         connection
