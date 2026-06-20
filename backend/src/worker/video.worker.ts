@@ -9,6 +9,7 @@ const worker = new Worker(
     async (job) => {
         console.log("Job received:", job.id);
         console.log("Video ID:", job.data.videoId);
+
         // job arrives
         const videoId = job.data.videoId
 
@@ -18,6 +19,14 @@ const worker = new Worker(
                 id: videoId
             }
         })
+
+        if (!video) {
+            throw new Error(`Video ${videoId} not found`);
+        }
+
+        if (!video.originalKey) {
+            throw new Error(`Video ${videoId} has no originalKey`);
+        }
 
         // update status
         await prisma.video.update({
@@ -29,13 +38,6 @@ const worker = new Worker(
             }
         })
 
-        if (!video) {
-            throw new Error(`Video ${videoId} not found`);
-        }
-
-        if (!video.originalKey) {
-            throw new Error(`Video ${videoId} has no originalKey`);
-        }
         // download video from s3
         const localPath = await downloadFromS3(video!.originalKey!, `${videoId}.mp4`)
 
