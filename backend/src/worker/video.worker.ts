@@ -46,7 +46,6 @@ const worker = new Worker(
         // transcode video to 360p using ffmpeg and save to temp folder
         console.log(`Transcoding video ${videoId} to 360p...`);
 
-
         const p360Path = `temp/${videoId}-360p.mp4`;
         const p720Path = `temp/${videoId}-720p.mp4`;
         const p1080Path = `temp/${videoId}-1080p.mp4`;
@@ -56,7 +55,7 @@ const worker = new Worker(
         await transcodeVideo(localPath, p1080Path, 1920, 1080);
 
         console.log(
-            `Transcoded video saved at ${`temp/${videoId}-360p.mp4`}, ${`temp/${videoId}-720p.mp4`}, ${`temp/${videoId}-1080p.mp4`}`
+            `Transcoded video saved at ${p360Path}, ${p720Path}, ${p1080Path}`
         );
 
         // do some processing here...

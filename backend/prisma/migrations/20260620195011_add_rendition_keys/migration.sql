@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Video" ADD COLUMN     "p1080Key" TEXT,
+ADD COLUMN     "p360Key" TEXT,
+ADD COLUMN     "p720Key" TEXT;

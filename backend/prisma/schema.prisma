@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Video {
-  id String @id @default(cuid())
-
+  id          String      @id @default(cuid())
+  status      VideoStatus @default(QUEUED)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   originalKey String?
-
-  status VideoStatus @default(QUEUED)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  p360Key  String?
+  p720Key  String?
+  p1080Key String?
 }
 
 enum VideoStatus {
-  UPLOADING
   QUEUED
   PROCESSING
   COMPLETED
   FAILED
+  UPLOADING
 }
