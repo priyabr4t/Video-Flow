@@ -3,6 +3,7 @@ import { connection } from "../queue/connection"
 import { prisma } from "../lib/prisma";
 import { downloadFromS3 } from "../storage/downloadFromS3";
 import { transcodeVideo } from "../services/transcodeVideo";
+import { uploadToS3 } from "../storage/uploadToS3";
 
 const worker = new Worker(
     "video-processing",
@@ -10,16 +11,17 @@ const worker = new Worker(
         console.log("Job received:", job.id);
         console.log("Video ID:", job.data.videoId);
 
-        // job arrives
+        // GET VIDEO ID FROM JOB DATA
         const videoId = job.data.videoId
 
-        // find video
+        // GET VIDEO FROM DATABASE
         const video = await prisma.video.findUnique({
             where: {
                 id: videoId
             }
         })
 
+        // CHECK IF VIDEO EXISTS AND HAS ORIGINAL KEY
         if (!video) {
             throw new Error(`Video ${videoId} not found`);
         }
@@ -28,7 +30,7 @@ const worker = new Worker(
             throw new Error(`Video ${videoId} has no originalKey`);
         }
 
-        // update status
+        // UPDATE VIDEO STATUS TO PROCESSING
         await prisma.video.update({
             where: {
                 id: videoId,
@@ -38,12 +40,11 @@ const worker = new Worker(
             }
         })
 
-        // download video from s3
+        // DOWNLOAD VIDEO FROM S3 TO TEMP FOLDER
         const localPath = await downloadFromS3(video!.originalKey!, `${videoId}.mp4`)
-
         console.log("Starting transcoding...");
 
-        // transcode video to 360p using ffmpeg and save to temp folder
+        // TRANSCODE VIDEO TO 360p, 720p, 1080p AND SAVE TO TEMP FOLDER
         console.log(`Transcoding video ${videoId} to 360p...`);
 
         const p360Path = `temp/${videoId}-360p.mp4`;
@@ -57,6 +58,18 @@ const worker = new Worker(
         console.log(
             `Transcoded video saved at ${p360Path}, ${p720Path}, ${p1080Path}`
         );
+
+        // UPLOAD TRANSCODED VIDEOS TO S3
+        const p360Key = `processed / ${videoId}/360p.mp4`;
+        const p720Key = `processed/${videoId}/720p.mp4`;
+        const p1080Key = `processed/${videoId}/1080p.mp4`;
+
+        await uploadToS3(p360Path, p360Key);
+        await uploadToS3(p720Path, p720Key);
+        await uploadToS3(p1080Path, p1080Key);
+
+        // STORE S3 KEYS IN DATABASE
+        // MARK COMPLETED IN DATABASE
 
         // do some processing here...
         console.log(`Downloaded video ${videoId} to ${localPath}`);
