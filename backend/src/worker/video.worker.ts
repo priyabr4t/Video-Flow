@@ -42,6 +42,9 @@ const worker = new Worker(
         console.log("Starting transcoding...");
 
         // transcode video to 360p using ffmpeg and save to temp folder
+
+        console.log(`Transcoding video ${videoId} to 360p...`);
+
         await transcodeVideo(
             localPath,
             `temp/${videoId}-360p.mp4`,
@@ -50,13 +53,18 @@ const worker = new Worker(
         );
 
         // transcode video to 720p using ffmpeg and save to temp folder
+        console.log(`Transcoding video ${videoId} to 720p...`);
+
         await transcodeVideo(
             localPath,
             `temp/${videoId}-720p.mp4`,
             1280,
             720
         );
+
         // transcode video to 1080p using ffmpeg and save to temp folder
+        console.log(`Transcoding video ${videoId} to 1080p...`);
+
         await transcodeVideo(
             localPath,
             `temp/${videoId}-1080p.mp4`,
