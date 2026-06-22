@@ -5,10 +5,7 @@ import { prisma } from "../lib/prisma";
 import { uploadToS3 } from "../storage/uploadToS3";
 import { videoQueue } from "../queue/video.queue";
 
-export const uploadVideo = async (
-    req: Request,
-    res: Response
-) => {
+export const uploadVideo = async (req: Request, res: Response) => {
     try {
 
 
@@ -71,6 +68,30 @@ export const uploadVideo = async (
 
         return res.status(500).json({
             message: "Upload failed",
+        });
+    }
+};
+
+export const getVideos = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const video = await prisma.video.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        if (!video) {
+            return res.status(404).json({
+                message: "Video not found",
+            });
+        }
+        return res.json({ video });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Failed to fetch video",
         });
     }
 };
