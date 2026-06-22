@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { uploadToS3 } from "../storage/uploadToS3";
 import { videoQueue } from "../queue/video.queue";
+import { getS3SignedUrl } from "../storage/getSignedUrl";
 
 export const uploadVideo = async (req: Request, res: Response) => {
     try {
@@ -86,7 +87,13 @@ export const getVideos = async (req: Request, res: Response) => {
                 message: "Video not found",
             });
         }
-        return res.json({ video });
+        const response = {
+            ...video,
+            p360Url: video.p360Key ? await getS3SignedUrl(video.p360Key) : null,
+            p720Url: video.p720Key ? await getS3SignedUrl(video.p720Key) : null,
+            p1080Url: video.p1080Key ? await getS3SignedUrl(video.p1080Key) : null,
+        }
+        return res.json(response);
     }
     catch (error) {
         console.error(error);
