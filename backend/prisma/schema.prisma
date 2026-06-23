@@ -16,6 +16,7 @@ model Video {
   p360Key     String?
   p720Key     String?
   p1080Key    String?
+  lesson      Lesson?
 }
 
 enum VideoStatus {
@@ -37,25 +38,24 @@ model User {
 }
 
 model Course {
-  id String   @id @default(cuid())
-  title String
+  id          String   @id @default(cuid())
+  title       String
   description String?
-  creatorId String
-  creator User @relation(fields: [creatorId], references: [id])
-  lessons Lesson[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id])
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-  model Lesson {
-  id String @id @default(cuid())
-  title String
-  courseId String
-  course Course @relation(fields: [courseId], references: [id])
-  videoId String?
-  video Video? @relation(fields: [videoId], references: [id])
+model Lesson {
+  id        String   @id @default(cuid())
+  title     String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  videoId   String?  @unique
+  video     Video?   @relation(fields: [videoId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  order Int
-} 
-
+  order     Int
+}
