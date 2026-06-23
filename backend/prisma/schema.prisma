@@ -34,25 +34,25 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  courses   Course[]
   role      UserRole @default(STUDENT)
+  courses   Course[] @relation("InstructorCourses")
 }
 
 enum UserRole {
   STUDENT
-  INSTRUCTOR  
+  INSTRUCTOR
   ADMIN
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
-  lessons     Lesson[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  instructorId String
+  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [id])
+  lessons      Lesson[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Lesson {
