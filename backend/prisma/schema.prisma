@@ -47,5 +47,15 @@ model Course {
   updatedAt DateTime @updatedAt
 }
 
-    
+  model Lesson {
+  id String @id @default(cuid())
+  title String
+  courseId String
+  course Course @relation(fields: [courseId], references: [id])
+  videoId String?
+  video Video? @relation(fields: [videoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order Int
+} 
 
