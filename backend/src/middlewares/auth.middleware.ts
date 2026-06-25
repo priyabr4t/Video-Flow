@@ -19,14 +19,13 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
             return res.status(401).json({ message: "User not found" })
         }
 
-        const authReq = req as any
-
-        authReq.user = {
-            id: payload.sub,
+        req.user = {
+            id: user.id,
             email: user.email,
-            role: payload.role,
             name: user.name,
-        }
+            role: user.role,
+        };
+        
         next()
     } catch (error) {
         return res.status(401).json({ message: "Invalid token" })
