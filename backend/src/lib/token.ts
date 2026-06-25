@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken"
 
-export const createAccessToken = (userId: string, role: "STUDENT" | "INSTRUCTOR" | "ADMIN") => {
+export type AppRole =
+    | "STUDENT"
+    | "INSTRUCTOR"
+    | "ADMIN";
+
+export const createAccessToken = (userId: string, role: AppRole) => {
     const payload = { sub: userId, role}
 
     return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
@@ -12,7 +17,7 @@ export const createAccessToken = (userId: string, role: "STUDENT" | "INSTRUCTOR"
 export const verifyAccessToken = (token: string) => {
     return jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
         sub: string,
-        role: "STUDENT" | "INSTRUCTOR" | "ADMIN"
+        role: AppRole
     }
 }
 
