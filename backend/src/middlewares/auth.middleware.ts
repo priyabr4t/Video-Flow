@@ -1,5 +1,5 @@
-import {NextFunction, Request, Response} from "express"
-import {verifyAccessToken} from "../lib/token"
+import { NextFunction, Request, Response } from "express"
+import { AppRole, verifyAccessToken } from "../lib/token"
 import { prisma } from "../lib/prisma"
 
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +16,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
         const user = await prisma.user.findUnique({ where: { id: payload.sub } })
 
         if (!user) {
-            return res.status(401).json({ message: "User not found" })
+            return res.status(401).json({ message: "Unauthorized" })
         }
 
         req.user = {
@@ -25,9 +25,23 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
             name: user.name,
             role: user.role,
         };
-        
+
         next()
     } catch (error) {
         return res.status(401).json({ message: "Invalid token" })
+    }
+}
+
+export const requireRole = (...allowedRoles: AppRole[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" })
+        }
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ message: "You dont have the correct role to access this route" })
+        }
+        next()
     }
 }

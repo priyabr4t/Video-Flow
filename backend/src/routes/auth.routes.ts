@@ -1,6 +1,6 @@
 import express from "express"
 import { registerHandler, loginHandler } from "../controllers/auth.controllers"
-import { requireAuth } from "../middlewares/auth.middleware"
+import { requireAuth, requireRole } from "../middlewares/auth.middleware"
 const router = express.Router()
 
 router.post("/register", registerHandler)
@@ -10,5 +10,11 @@ router.get("/me", requireAuth, (req, res) => {
         user: req.user,
     });
 });
+router.post(
+    "/courses",
+    requireAuth,
+    requireRole("INSTRUCTOR"),
+    createCourse
+);
 
 export default router
