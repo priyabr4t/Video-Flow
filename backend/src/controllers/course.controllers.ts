@@ -32,3 +32,36 @@ export const createCourseHandler = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const getCoursesHandler = async (req: Request, res: Response) => {
+    try {
+        const courses = await prisma.course.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                instructor: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        lessons: true,
+                    },
+                },
+            },
+        });
+
+        return res.status(200).json({
+            message: "Courses fetched successfully",
+            courses,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
