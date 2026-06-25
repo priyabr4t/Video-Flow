@@ -65,3 +65,51 @@ export const getCoursesHandler = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const getCourseByIdHandler = async (req: Request, res: Response) => {
+    try {
+        const courseId = req.params.courseId as string;
+        const course = await prisma.course.findUnique({
+            where: {
+                id: courseId,
+            },
+            include: {
+                instructor: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                lessons: {
+                    orderBy: {
+                        order: "asc",
+                    },
+                    include: {
+                        video: {
+                            select: {
+                                id: true,
+                                status: true,
+                                p360Key: true,
+                                p720Key: true,
+                                p1080Key: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+        return res.status(200).json({
+            message: "Course fetched successfully",
+            course,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
