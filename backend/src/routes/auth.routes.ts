@@ -11,11 +11,6 @@ router.get("/me", requireAuth, (req, res) => {
         user: req.user,
     });
 });
-router.post(
-    "/courses",
-    requireAuth,
-    requireRole("INSTRUCTOR"),
-    createCourseHandler
-);
+
 
 export default router
