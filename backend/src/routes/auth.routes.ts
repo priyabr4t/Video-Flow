@@ -1,6 +1,7 @@
 import express from "express"
 import { registerHandler, loginHandler } from "../controllers/auth.controllers"
 import { requireAuth, requireRole } from "../middlewares/auth.middleware"
+import { createCourseHandler } from "../controllers/course.controllers"
 const router = express.Router()
 
 router.post("/register", registerHandler)
@@ -14,7 +15,7 @@ router.post(
     "/courses",
     requireAuth,
     requireRole("INSTRUCTOR"),
-    createCourse
+    createCourseHandler
 );
 
 export default router
