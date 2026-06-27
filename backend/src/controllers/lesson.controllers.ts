@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { uploadToS3 } from "../storage/uploadToS3";
 import { videoQueue } from "../queue/video.queue";
 import fs from "fs";
+import { getS3SignedUrl } from "../storage/getSignedUrl";
 
 export const createLessonHandler = async (
     req: Request,
@@ -93,7 +94,7 @@ export const createLessonHandler = async (
 
 export const uploadLessonVideoHandler = async (req: Request, res: Response) => {
     let videoId: string | null = null;
-    
+
     try {
         const lessonId = req.params.lessonId as string;
         if (!req.file) {
@@ -205,6 +206,49 @@ export const uploadLessonVideoHandler = async (req: Request, res: Response) => {
         }
         return res.status(500).json({
             message: "Failed to upload video",
+        });
+    }
+};
+
+export const getLessonVideoHandler = async (req: Request, res: Response) => {
+    try {
+        const lessonId = req.params.lessonId as string;
+
+        const lesson = await prisma.lesson.findUnique({
+            where: {
+                id: lessonId,
+            },
+            include: {
+                video: true,
+            },
+        });
+
+        if (!lesson) {
+            return res.status(404).json({
+                message: "Lesson not found",
+            });
+        }
+
+        if (!lesson.video) {
+            return res.status(404).json({
+                message: "No video associated with this lesson",
+            });
+        }
+
+        const video = lesson.video;
+
+        return res.json({
+            id: video.id,
+            status: video.status,
+            p360Url: video.p360Key ? await getS3SignedUrl(video.p360Key) : null,
+            p720Url: video.p720Key ? await getS3SignedUrl(video.p720Key) : null,
+            p1080Url: video.p1080Key ? await getS3SignedUrl(video.p1080Key) : null,
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Failed to fetch lesson video",
         });
     }
 };
