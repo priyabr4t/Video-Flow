@@ -3,6 +3,7 @@ import cors from "cors";
 import videoRoutes from "./routes/video.routes";
 import authRoutes from "./routes/auth.routes";
 import courseRoutes from "./routes/course.routes";
+import lessonRoutes from "./routes/lesson.routes";
 
 const app = express();
 
@@ -11,6 +12,8 @@ app.use(express.json());
 app.use("/videos", videoRoutes);
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
+app.use("/lessons", lessonRoutes);
+
 app.get("/health", (_, res) => {
   res.status(200).json({
     status: "ok",
