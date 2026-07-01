@@ -308,6 +308,3 @@ Modern video platforms process media asynchronously rather than blocking user re
 # License
 
 MIT
-
-
-I would also recommend adding a few screenshots later (Swagger UI, S3 bucket structure, architecture diagram, and database schema). Those visual elements make the repository feel much more polished to recruiters.
