@@ -1,8 +1,9 @@
-import { generateHLS } from "../services/generateHLS";
+import { HLS_VARIANTS } from "../services/generateHLSVariant";
+import { generateMasterPlaylist } from "../services/generateMasterPlaylist";
 
 async function main() {
   try {
-    await generateHLS("./temp/input.mp4", "./temp/output");
+    await generateMasterPlaylist("./temp/output", HLS_VARIANTS);
 
     console.log("✅ HLS generation completed.");
   } catch (err) {

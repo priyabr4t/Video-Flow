@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "worker": "tsx src/worker/video.worker.ts",
-    "test-hls": "tsx src/scripts/testHLS.ts"
+    "test-hls": "tsx src/scripts/testHLS.ts",
+    "test-master": "tsx src/scripts/testMasterPlaylist.ts"
   },
   "keywords": [],
   "author": "",
