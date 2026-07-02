@@ -10,6 +10,7 @@ export type HLSVariant = {
 
   videoBitrate: string;
   audioBitrate: string;
+  bandwidth: number;
 };
 
 export const HLS_VARIANTS: HLSVariant[] = [
@@ -19,6 +20,7 @@ export const HLS_VARIANTS: HLSVariant[] = [
     height: 360,
     videoBitrate: "800k",
     audioBitrate: "96k",
+    bandwidth: 896000,
   },
   {
     name: "720p",
@@ -26,6 +28,7 @@ export const HLS_VARIANTS: HLSVariant[] = [
     height: 720,
     videoBitrate: "2800k",
     audioBitrate: "128k",
+    bandwidth: 2928000,
   },
   {
     name: "1080p",
@@ -33,6 +36,7 @@ export const HLS_VARIANTS: HLSVariant[] = [
     height: 1080,
     videoBitrate: "5000k",
     audioBitrate: "192k",
+    bandwidth: 5192000,
   },
 ];
 
