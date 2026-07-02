@@ -2,6 +2,48 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
+type HLSVariant = {
+  name: string;
+  width: number;
+  height: number;
+
+  videoBitrate: string;
+  maxBitrate: string;
+  bufferSize: string;
+
+  audioBitrate: string;
+};
+
+const variants: HLSVariant[] = [
+  {
+    name: "360p",
+    width: 640,
+    height: 360,
+    videoBitrate: "800k",
+    maxBitrate: "856k",
+    bufferSize: "1200k",
+    audioBitrate: "96k",
+  },
+  {
+    name: "720p",
+    width: 1280,
+    height: 720,
+    videoBitrate: "2800k",
+    maxBitrate: "2996k",
+    bufferSize: "4200k",
+    audioBitrate: "128k",
+  },
+  {
+    name: "1080p",
+    width: 1920,
+    height: 1080,
+    videoBitrate: "5000k",
+    maxBitrate: "5350k",
+    bufferSize: "7500k",
+    audioBitrate: "192k",
+  },
+];
+
 export async function generateHLS(
   inputPath: string,
   outputDir: string,
@@ -10,16 +52,15 @@ export async function generateHLS(
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  fs.mkdirSync(path.join(outputDir, "360p"), { recursive: true });
-  fs.mkdirSync(path.join(outputDir, "720p"), { recursive: true });
-  fs.mkdirSync(path.join(outputDir, "1080p"), { recursive: true });
+  for (const variant of variants) {
+    fs.mkdirSync(path.join(outputDir, variant.name), { recursive: true });
+  }
 
-  const filterGraph = [
-    "[0:v]split=3[v360][v720][v1080]",
-    "[v360]scale=w=-2:h=360:force_original_aspect_ratio=decrease[v360out]",
-    "[v720]scale=w=-2:h=720:force_original_aspect_ratio=decrease[v720out]",
-    "[v1080]scale=w=-2:h=1080:force_original_aspect_ratio=decrease[v1080out]",
-  ].join(";");
+  const filterGraph = variants
+    .map((variant, index) => {
+      return `[v${index}]scale=w=-2:h=${variant.height}:force_original_aspect_ratio=decrease[v${index}out]`;
+    })
+    .join(";");
 
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn("ffmpeg", [
@@ -28,6 +69,18 @@ export async function generateHLS(
 
       "-filter_complex",
       filterGraph,
+
+      "-map",
+      "[v720out]",
+
+      "-map",
+      "[v360out]",
+
+      "-map",
+      "[v1080out]",
+
+      "-map",
+      "0:a",
 
       "-c:v",
       "libx264",
