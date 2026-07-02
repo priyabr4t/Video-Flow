@@ -22,8 +22,8 @@ export async function generateHLS(
       "-i",
       inputPath,
 
-      "-vf",
-      "scale=-2:720",
+      "-filter_complex",
+      filterGraph,
 
       "-c:v",
       "libx264",
