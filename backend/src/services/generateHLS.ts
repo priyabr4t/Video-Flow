@@ -10,6 +10,10 @@ export async function generateHLS(
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  fs.mkdirSync(path.join(outputDir, "360p"), { recursive: true });
+  fs.mkdirSync(path.join(outputDir, "720p"), { recursive: true });
+  fs.mkdirSync(path.join(outputDir, "1080p"), { recursive: true });
+
   const filterGraph = [
     "[0:v]split=3[v360][v720][v1080]",
     "[v360]scale=w=-2:h=360:force_original_aspect_ratio=decrease[v360out]",
