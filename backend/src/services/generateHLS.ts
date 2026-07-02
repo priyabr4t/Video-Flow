@@ -9,13 +9,21 @@ export async function generateHLS(
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
+
+  const filterGraph = [
+    "[0:v]split=3[v360][v720][v1080]",
+    "[v360]scale=640:360[v360out]",
+    "[v720]scale=1280:720[v720out]",
+    "[v1080]scale=1920:1080[v1080out]",
+  ].join(";");
+
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn("ffmpeg", [
       "-i",
       inputPath,
 
       "-vf",
-      "scale=1280:720",
+      "scale=-2:720",
 
       "-c:v",
       "libx264",
