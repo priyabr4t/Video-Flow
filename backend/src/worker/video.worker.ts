@@ -9,6 +9,7 @@ import {
   HLS_VARIANTS,
 } from "../services/generateHLSVariant";
 import path from "path";
+import { generateMasterPlaylist } from "../services/generateMasterPlaylist";
 
 const worker = new Worker(
   "video-processing",
@@ -62,6 +63,10 @@ const worker = new Worker(
     }
     console.log(`All HLS variants generated successfully.`);
 
+    generateMasterPlaylist(outputDir, HLS_VARIANTS);
+
+    console.log("Master playlist generated successfully.");
+    
     //     // UPLOAD TRANSCODED VIDEOS TO S3
     //     const p360Key = `processed/${videoId}/360p.mp4`;
     //     const p720Key = `processed/${videoId}/720p.mp4`;
