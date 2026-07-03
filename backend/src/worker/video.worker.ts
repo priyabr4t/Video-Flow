@@ -3,16 +3,14 @@ import { connection } from "../queue/connection";
 import { prisma } from "../lib/prisma";
 import { downloadFromS3 } from "../storage/downloadFromS3";
 import { uploadToS3 } from "../storage/uploadToS3";
-import fs from "fs";
 import {
   generateHLSVariant,
   HLS_VARIANTS,
 } from "../services/generateHLSVariant";
 import path from "path";
 import { generateMasterPlaylist } from "../services/generateMasterPlaylist";
-import "dotenv/config";
 import { uploadDirectoryToS3 } from "../storage/uploadDirectoryToS3";
-console.log(process.env.AWS_REGION);
+
 const worker = new Worker(
   "video-processing",
   async (job) => {
@@ -77,6 +75,16 @@ const worker = new Worker(
     );
 
     console.log("HLS package uploaded successfully.");
+
+    await prisma.video.update({
+      where: {
+        id: videoId,
+      },
+      data: {
+        hlsMasterKey: `processed/${videoId}/master.m3u8`,
+        status: "COMPLETED",
+      },
+    });
   },
   {
     connection,
