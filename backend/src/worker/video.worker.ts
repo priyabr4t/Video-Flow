@@ -2,7 +2,6 @@ import { Worker } from "bullmq";
 import { connection } from "../queue/connection";
 import { prisma } from "../lib/prisma";
 import { downloadFromS3 } from "../storage/downloadFromS3";
-import { uploadToS3 } from "../storage/uploadToS3";
 import {
   generateHLSVariant,
   HLS_VARIANTS,
@@ -10,6 +9,7 @@ import {
 import path from "path";
 import { generateMasterPlaylist } from "../services/generateMasterPlaylist";
 import { uploadDirectoryToS3 } from "../storage/uploadDirectoryToS3";
+import fs from "fs";
 
 const worker = new Worker(
   "video-processing",
@@ -84,7 +84,16 @@ const worker = new Worker(
         hlsMasterKey: `processed/${videoId}/master.m3u8`,
         status: "COMPLETED",
       },
+
     });
+
+    fs.unlinkSync(localPath)
+
+    fs.rmSync(outputDir, {
+      recursive: true,
+      force: true,
+    })
+
   },
   {
     connection,
