@@ -10,7 +10,9 @@ import {
 } from "../services/generateHLSVariant";
 import path from "path";
 import { generateMasterPlaylist } from "../services/generateMasterPlaylist";
-
+import "dotenv/config";
+import { uploadDirectoryToS3 } from "../storage/uploadDirectoryToS3";
+console.log(process.env.AWS_REGION);
 const worker = new Worker(
   "video-processing",
   async (job) => {
@@ -66,6 +68,15 @@ const worker = new Worker(
     generateMasterPlaylist(outputDir, HLS_VARIANTS);
 
     console.log("Master playlist generated successfully.");
+
+    console.log("Uploading HLS package to S3...");
+
+    await uploadDirectoryToS3(
+      outputDir,
+      `processed/${videoId}`
+    );
+
+    console.log("HLS package uploaded successfully.");
   },
   {
     connection,

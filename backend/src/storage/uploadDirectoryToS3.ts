@@ -24,7 +24,11 @@ export async function uploadDirectoryToS3(
                 s3Key
             )
         } else {
-            await uploadToS3(localPath, s3Key)
+            console.log(`Uploading: ${localPath} -> ${s3Key}`);
+
+            await uploadToS3(localPath, s3Key);
+
+            console.log(`Finished: ${s3Key}`);
         }
     }
 }
