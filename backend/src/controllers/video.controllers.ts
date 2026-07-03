@@ -89,10 +89,11 @@ export const getVideos = async (req: Request, res: Response) => {
         }
         const response = {
             ...video,
-            p360Url: video.p360Key ? await getS3SignedUrl(video.p360Key) : null,
-            p720Url: video.p720Key ? await getS3SignedUrl(video.p720Key) : null,
-            p1080Url: video.p1080Key ? await getS3SignedUrl(video.p1080Key) : null,
-        }
+            streamUrl: video.hlsMasterKey
+                ? await getS3SignedUrl(video.hlsMasterKey)
+                : null,
+        };
+
         return res.json(response);
     }
     catch (error) {

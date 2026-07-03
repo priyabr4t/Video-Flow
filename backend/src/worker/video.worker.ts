@@ -52,30 +52,29 @@ const worker = new Worker(
       `${videoId}.mp4`,
     );
     console.log("Starting HLS generation...");
-
+    // TEMP DIRECTORY FOR GENERATED HLS FILES
     const outputDir = path.join("temp", videoId);
 
-    console.log(`Generating HLS variants...`);
-
+    // GENERATE ALL HLS VARIANTS (360p, 720p, 1080p)
     for (const variant of HLS_VARIANTS) {
       console.log(`Generating ${variant.name}...`);
       await generateHLSVariant(localPath, outputDir, variant);
     }
     console.log(`All HLS variants generated successfully.`);
-
+    // GENERATE MASTER PLAYLIST
     generateMasterPlaylist(outputDir, HLS_VARIANTS);
 
     console.log("Master playlist generated successfully.");
 
     console.log("Uploading HLS package to S3...");
-
+    // UPLOAD COMPLETE HLS PACKAGE TO S3
     await uploadDirectoryToS3(
       outputDir,
       `processed/${videoId}`
     );
 
     console.log("HLS package uploaded successfully.");
-
+    // STORE MASTER PLAYLIST LOCATION IN DATABASE
     await prisma.video.update({
       where: {
         id: videoId,
@@ -86,13 +85,14 @@ const worker = new Worker(
       },
 
     });
-
+    // CLEAN UP LOCAL TEMP FILES
     fs.unlinkSync(localPath)
 
     fs.rmSync(outputDir, {
       recursive: true,
       force: true,
     })
+    console.log(`Video ${videoId} processed successfully.`);
 
   },
   {

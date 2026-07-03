@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Video {
-  id          String      @id @default(cuid())
-  status      VideoStatus @default(QUEUED)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String      @id @default(cuid())
+  status       VideoStatus @default(QUEUED)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
   hlsMasterKey String?
-  lesson      Lesson?
+  originalKey  String?
+  lesson       Lesson?
 }
 
 enum VideoStatus {
