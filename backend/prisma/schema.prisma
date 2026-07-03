@@ -12,10 +12,7 @@ model Video {
   status      VideoStatus @default(QUEUED)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  originalKey String?
-  p360Key     String?
-  p720Key     String?
-  p1080Key    String?
+  hlsMasterKey String?
   lesson      Lesson?
 }
 
