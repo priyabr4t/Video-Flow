@@ -138,11 +138,10 @@ export const getVideoStream = async (
     }
 
     // GENERATE SIGNED URL FOR HLS MASTER KEY
-    const streamUrl = await getS3SignedUrl(
-        video.hlsMasterKey
-    );
+    const streamUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${video.hlsMasterKey}`;
+
     // RETURN SIGNED URL
-    return res.status(200).json({
+    return res.json({
         streamUrl,
     });
 
