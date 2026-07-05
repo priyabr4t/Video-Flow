@@ -103,3 +103,47 @@ export const getVideos = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const getVideoStream = async (
+    req: Request,
+    res: Response,
+) => {
+    const videoId = req.params.id;
+
+    const video = await prisma.video.findUnique({
+        where: {
+            id: videoId as string,
+        },
+    });
+
+    // CHECK IF VIDEO EXISTS
+    if (!video) {
+        return res.status(404).json({
+            message: "Video not found",
+        });
+    }
+
+    // CHECK IF VIDEO HAS FINISHED PROCESSING
+    if (video.status !== "COMPLETED") {
+        return res.status(400).json({
+            message: "Video is still processing",
+        });
+    }
+
+    // CHECK IF VIDEO HAS HLS MASTER KEY
+    if (!video.hlsMasterKey) {
+        return res.status(404).json({
+            message: "Stream not found",
+        });
+    }
+
+    // GENERATE SIGNED URL FOR HLS MASTER KEY
+    const streamUrl = await getS3SignedUrl(
+        video.hlsMasterKey
+    );
+    // RETURN SIGNED URL
+    return res.status(200).json({
+        streamUrl,
+    });
+
+}
