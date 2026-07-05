@@ -146,3 +146,24 @@ export const getVideoStream = async (
     });
 
 }
+
+export const getAllVideos = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const videos = await prisma.video.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.json(videos);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Failed to fetch videos",
+    });
+  }
+};
